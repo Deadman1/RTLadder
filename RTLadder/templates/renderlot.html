@@ -1,0 +1,63 @@
+﻿
+<table>
+    <tr>
+        <td valign="top">
+
+            
+            <h2>{{ container.players|length }} Players</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <td>Rank</td>
+                        <td>Player</td>
+                        <td>Num&nbsp;Wins</td>
+                    </tr>
+                </thead>
+                {%for player in container.playersSorted%}
+                <tr>
+        
+                    <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
+                    <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #00FF00" {%endif%}>
+                        <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
+                    </td>
+                    <td>{{ container.lot.playerWins.get(player.key.id(), 0) }}</td>
+                </tr>
+                {%endfor%}
+            </table>
+            Green highlight means they're<br />playing in the ladder now.
+
+        </td>
+        <td valign="top">
+
+
+            
+            <h2>{{ container.games|length }} Games</h2>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <td>Game</td>
+                        <td>Winner</td>
+                    </tr>
+                </thead>
+                {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}
+    
+                <tr>
+                    <td>
+                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{game.name}}</a>
+
+                    </td>
+                    <td>
+                        {%if game.winner is not none%}
+                        {{ container.players[game.winner].name|escape }}
+                        {%endif%}
+
+                    </td>
+                </tr>
+
+                {%endfor%}
+            </table>
+
+        </td>
+    </tr>
+</table>

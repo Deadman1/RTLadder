@@ -1,0 +1,18 @@
+﻿{%extends "templates/base.html"%}
+{%block body%}
+
+<a href="/">&lt;&lt; Home</a>
+<h1>{{container.lot.name|escape}}</h1>
+
+
+{%if not container.lot.hasEnded()%}
+<a href="/join/{{container.lot.key.id()}}">Join</a> | <a href="/leave/{{container.lot.key.id()}}">Leave</a>
+<br />
+{%endif%}
+
+{{ lotrendered }}
+
+
+
+{%endblock%}
+

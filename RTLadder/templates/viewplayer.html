@@ -1,0 +1,42 @@
+﻿{%extends "templates/base.html"%}
+{%block body%}
+
+<a href="/">&lt;&lt; Home</a>
+
+
+
+<table>
+    <tr>
+        <td>
+            <div style="border-radius: 8px; width: 40px; height: 40px;  background-color: {{player.color}}"></div> 
+        </td>
+        <td>
+            <h1>{{player.name|escape}}</h1>
+        </td>
+    </tr>
+
+</table>
+
+<a href="http://warlight.net/Profile?p={{player.inviteToken}}">WarLight.net profile</a><br />
+First joined: {{player.created}}<br />
+
+<h2>Games</h2>
+
+<table border="1" cellspacing="0">
+    <thead>
+        <tr>
+            <td>Game</td>
+        </tr>
+    </thead>
+    {%for game in games%}
+    
+    <tr>
+        <td><a href="http://warlight.net/MultiPlayer?GameID={{game.wlnetGameID}}">{{game.name}}</a></td>
+    </tr>
+
+    {%endfor%}
+</table>
+
+
+{%endblock%}
+
