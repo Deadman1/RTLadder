@@ -51,7 +51,7 @@ def createGame(request, container, players, templateID):
     for p in players:
         container.players[p.key.id()] = p
     
-    logging.info("Created game " + str(g.key.id()) + " '" + gameName + "', wlnetGameID=" + str(gid))
+    logging.info("Created game " + str(g.key.id()) + " '" + gameName + "', wlnetGameID=" + str(gid) + "', TemplateID=" + str(templateID))
     
     return g
 
