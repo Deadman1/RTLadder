@@ -29,7 +29,7 @@ def createGames(request, container):
     templateID = 251301
     
     #Create a game for everyone not in a game.
-    gamesCreated = [createGame(request, container, pair, templateID) for pair in pairs(playersNotInGames)]
+    gamesCreated = [createGame(request, container, pair, templateID) for pair in createPlayerPairs(container.lot.playerRanks, playersNotInGames)]
     logging.info("Created games " + unicode(','.join([unicode(g) for g in gamesCreated])))
 
 
@@ -70,3 +70,21 @@ def gameFailedToStart(elapsed):
     start or not based on how long it's been in the lobby"""
     
     return elapsed.seconds >= 600
+
+"""
+This method creates pairs between players, so that games can be created for each pair.
+The algorithm creates pairs of the 2 lowest ranked players from the pool till no further pairs can be created.
+If there are odd number of players, the top ranked player will not get paired
+"""
+def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList):
+    eligiblePlayersSortedByRank = []
+    for player in completePlayerListSortedByRank:
+        for p in EligibleForGamesplayerList:
+            if player == p.key.id():
+                eligiblePlayersSortedByRank.append(p)
+    
+    # reverse the ranks. The pairing occurs from the bottom.
+    eligiblePlayersSortedByRank.reverse()
+    
+    return pairs(eligiblePlayersSortedByRank)
+    
