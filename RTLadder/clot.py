@@ -1,8 +1,10 @@
 ﻿from games import createGame
 from main import flatten, group
 
+import ConfigParser
 import logging
 import random
+import os.path
 
 
 def createGames(request, container):
@@ -21,15 +23,13 @@ def createGames(request, container):
     #Find all players who aren't any active games and also have not left the CLOT (isParticipating is true)
     playersNotInGames = [container.players[p] for p in container.lot.playersParticipating if p not in playerIDsInActiveGames]
     logging.info("Players not in games: " + ','.join([unicode(p) for p in playersNotInGames]))
-    
-    #Randomize the order
-    random.shuffle(playersNotInGames)
-    
+
     #The template ID defines the settings used when the game is created.  You can create your own template on warlight.net and enter its ID here
-    templateID = 251301
+    templates = getTemplates()
     
     #Create a game for everyone not in a game.
-    gamesCreated = [createGame(request, container, pair, templateID) for pair in createPlayerPairs(container.lot.playerRanks, playersNotInGames)]
+    #From a list of templates, a random one is picked for each game
+    gamesCreated = [createGame(request, container, pair, int(random.choice(templates))) for pair in createPlayerPairs(container.lot.playerRanks, playersNotInGames)]
     logging.info("Created games " + unicode(','.join([unicode(g) for g in gamesCreated])))
 
 
@@ -87,4 +87,21 @@ def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList
     eligiblePlayersSortedByRank.reverse()
     
     return pairs(eligiblePlayersSortedByRank)
+   
+
+def getTemplates():
+    templates = []    
     
+    cfgFile = os.path.dirname(__file__) + '/config/Ladder.cfg'
+    Config = ConfigParser.ConfigParser()
+    Config.read(cfgFile)
+    
+    if Config.has_section('RTLadder'):
+        allTemplates = Config.get("RTLadder", "templates")
+        delimiter = Config.get("RTLadder","delimiter")
+        templates = allTemplates.split(delimiter)
+    else:
+        #If no templates found in cfg file, use default template
+        templates.append(251301)
+        
+    return templates
