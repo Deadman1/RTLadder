@@ -1,6 +1,4 @@
 from google.appengine.ext import ndb
-from api import postToApi
-from main import getClotConfig
 
 import json
 import urlparse
@@ -56,3 +54,7 @@ def createGame(request, container, players, templateID):
     logging.info("Created game " + str(g.key.id()) + " '" + gameName + "', wlnetGameID=" + str(gid))
     
     return g
+
+
+from api import postToApi
+from main import getClotConfig

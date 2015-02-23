@@ -5,7 +5,7 @@ from itertools import groupby
 import os
 import jinja2
 import webapp2
-import api
+
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -64,3 +64,6 @@ class BaseHandler(webapp2.RequestHandler):              # taken from the webapp2
     def session(self):
         # Returns a session using the default cookie key.
         return self.session_store.get_session()
+
+
+import api

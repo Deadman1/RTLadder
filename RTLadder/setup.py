@@ -1,5 +1,5 @@
 ﻿from main import BaseHandler, get_template, ClotConfig, ndb
-from wtforms import Form, TextField, validators
+from wtforms import TextField, Form, validators
 
 import api
 

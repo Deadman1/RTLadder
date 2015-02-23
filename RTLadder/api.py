@@ -1,8 +1,5 @@
 ﻿from google.appengine.ext import ndb
 from random import randint
-from main import getClotConfig
-from games import Game
-from players import Player
 
 import httplib
 import urllib
@@ -74,5 +71,6 @@ def testModeApi(api, postData):
 
 
 
-
-
+from main import getClotConfig
+from games import Game
+from players import Player
