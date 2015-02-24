@@ -6,7 +6,7 @@ import urllib
 import urlparse
 import json
 
-# TODO : Set it to true before going to production
+# TODO : Set it to false before going to production
 #If you enable TestMode here, all calls to the WarLight API that your code
 # makes will be intercepted and dummy data will be returned.  This is useful
 # for testing your code before you release it to the public.  Make sure to 
