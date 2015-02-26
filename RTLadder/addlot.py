@@ -18,7 +18,9 @@ class AddLotPage(BaseHandler):
             return self.response.write("Please enter all fields")
         
         newlot = lot.LOT(name = form.name.data)
-        newlot.playerWins = { } #empty dictionary
+        newlot.playerRating = { } #empty dictionary
+        newlot.playerMean = { } #empty dictionary
+        newlot.playerStandardDeviation = { } #empty dictionary
         newlot.put()
         lot.lotAddedOrRemoved()
         

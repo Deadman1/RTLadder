@@ -13,8 +13,10 @@ class LOT(ndb.Model):
     dateCreated = ndb.DateTimeProperty(auto_now_add=True)
     dateEnded = ndb.DateTimeProperty()
     playersParticipating = ndb.IntegerProperty(repeated=True) #list of player IDs
-    playerRanks = ndb.IntegerProperty(repeated=True) #List of player IDs, in order by rank (first is first place, etc.)
-    playerWins = ndb.PickleProperty() #Dictionary of player IDs mapped to the number of wins they have
+    playerRanks = ndb.IntegerProperty(repeated=True) #List of player IDs, in order by rank (first is first place, etc.)    
+    playerRating = ndb.PickleProperty() #Dictionary of player IDs mapped to their TrueSkill rating
+    playerMean = ndb.PickleProperty()
+    playerStandardDeviation = ndb.PickleProperty() 
 
     def hasEnded(self):
         return self.dateEnded is not None

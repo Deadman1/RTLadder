@@ -1,4 +1,4 @@
-﻿
+
 <table>
     <tr>
         <td valign="top">
@@ -20,7 +20,7 @@
                     <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #00FF00" {%endif%}>
                         <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
                     </td>
-                    <td>{{ container.lot.playerWins.get(player.key.id(), 0) }}</td>
+                    <td>{{ container.lot.playerRating.get(player.key.id(), 0) }}</td>
                 </tr>
                 {%endfor%}
             </table>
