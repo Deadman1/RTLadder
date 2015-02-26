@@ -1,16 +1,19 @@
 ﻿from games import createGame
-from main import flatten, group
+from main import flatten
 
 import ConfigParser
 import logging
 import random
 import os.path
 from datetime import datetime
+from TrueSkill.trueskill import Rating, rate_1vs1
 
 
 #The template ID defines the settings used when the game is created.  You can create your own template on warlight.net and enter its ID here
-templates = []
-timeBetweenGamesInMinutes = None
+templates = [251301]
+timeBetweenGamesInMinutes = 120
+InitialMean = 2000.0
+InitialStandardDeviation = 200.0
 
 
 def createGames(request, container):
@@ -40,8 +43,6 @@ def createGames(request, container):
     #Find all players who aren't any active games and also have not left the CLOT (isParticipating is true)
     playersNotInGames = [container.players[p] for p in container.lot.playersParticipating if p not in playerIDsInActiveGames]
     logging.info("Players not in games: " + ','.join([unicode(p) for p in playersNotInGames]))
-
-    
     
     #Create a game for everyone not in a game.
     #From a list of templates, a random one is picked for each game
@@ -54,23 +55,33 @@ def setRanks(container):
     The current algorithm is very simple - just award ranks based on number of games won.
     You should replace this with your own ranking logic."""
     
-    #Load all finished games
-    finishedGames = [g for g in container.games if g.winner != None]
+    #Load all finished games which haven't been considered in the ranking
+    finishedGames = [g for g in container.games if g.winner != None and g.HasRatingChangedDueToResult ==False]
     
-    #Group them by who won
-    finishedGamesGroupedByWinner = group(finishedGames, lambda g: g.winner)
+    #update ratings in the container object
+    updateRatingBasedOnRecentFinsihedGames(finishedGames, container)
     
-    #Get rid of the game data, and replace it with the number of games each player won
-    container.lot.playerWins = dict(map(lambda (playerID,games): (playerID, len(games)), finishedGamesGroupedByWinner.items())) 
-    
-    #Map this from Player.query() to ensure we have an entry for every player, even those with no wins
-    playersMappedToNumWins = [(p, container.lot.playerWins.get(p.key.id(), 0)) for p in container.players.values()]
-    
-    #sort by the number of wins each player has.
-    playersMappedToNumWins.sort(key=lambda (player,numWins): numWins, reverse=True)
+    #Map this from Player.query() to ensure we have an entry for every player, even those with no wins(assign default rating if none exists)
+    playersMappedToRating = [(p, container.lot.playerRating.get(p.key.id(), computeRating(InitialMean, InitialStandardDeviation))) for p in container.players.values()]
+    playersMappedToMean = [(p, container.lot.playerMean.get(p.key.id(), InitialMean)) for p in container.players.values()]
+    playersMappedToStandardDeviation = [(p, container.lot.playerStandardDeviation.get(p.key.id(), InitialStandardDeviation)) for p in container.players.values()]
+        
+    #sort by player rating.
+    playersMappedToRating.sort(key=lambda (player,rating): rating, reverse=True)
     
     #Store the player IDs back into the LOT object
-    container.lot.playerRanks = [p[0].key.id() for p in playersMappedToNumWins]
+    container.lot.playerRanks = [p[0].key.id() for p in playersMappedToRating]
+    container.lot.playerMean = playersMappedToMean
+    container.lot.playerStandardDeviation = playersMappedToStandardDeviation
+    container.lot.playerRating = playersMappedToRating
+    
+    allGames = container.games
+    
+    # Set all games' HasRatingChangedDueToResult flag to true
+    for game in allGames:
+        game.HasRatingChangedDueToResult = True
+        
+    container.games = allGames    
     
     logging.info('setRanks finished')
 
@@ -78,13 +89,12 @@ def setRanks(container):
 def gameFailedToStart(elapsed):
     """This is called for games that are in the lobby.  We should determine if the game failed to
     start or not based on how long it's been in the lobby"""
-    
     return elapsed.seconds >= 600
 
-"""
-This method creates pairs between players, so that games can be created for each pair.
+
+""" This method creates pairs between players, so that games can be created for each pair.
 The algorithm creates pairs of the 2 lowest ranked players from the pool till no further pairs can be created.
-If there are odd number of players, the top ranked player will not get paired.
+If there are odd number of players, the bottom ranked player will not get paired.
 There is also a restriction that players who have played each other recently cannot play each other.
 """
 def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList, recentGames):
@@ -93,9 +103,6 @@ def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList
         for p in EligibleForGamesplayerList:
             if player == p.key.id():
                 eligiblePlayersSortedByRank.append(p)
-    
-    # reverse the ranks. The pairing occurs from the bottom.
-    eligiblePlayersSortedByRank.reverse()
     
     # Dict containing each player as key, and list of players they have played as value
     # {p1:[p2,p3]}
@@ -145,6 +152,7 @@ def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList
 
     return playerPairs
 
+
 """Reads configuration for RT ladder"""
 def readConfigForRTLadder():
     cfgFile = os.path.dirname(__file__) + '/config/Ladder.cfg'
@@ -154,16 +162,61 @@ def readConfigForRTLadder():
     # declare as global variables
     global templates
     global timeBetweenGamesInMinutes
+    global InitialMean
+    global InitialStandardDeviation
     
     try:
         allTemplates = Config.get("RTLadder", "templates")
         delimiter = Config.get("RTLadder","delimiter")
         templates = allTemplates.split(delimiter)
-    except:
-        #If no templates found in cfg file, use default template
-        templates.append(251301)
-    
-    try:
         timeBetweenGamesInMinutes = int(Config.get("RTLadder", "timeBetweenGamesInMinutes"))
+        InitialMean = float(Config.get("RTLadder", "initialMean"))
+        InitialStandardDeviation = float(Config.get("RTLadder", "initialStandardDeviation"))
     except:
-        timeBetweenGamesInMinutes = 120
+        raise Exception("Failed to load RT ladder config file")
+
+""" Given a mean and a standardDeviation, the rating is calculated as """
+def computeRating(mean, standardDeviation):
+    return mean - standardDeviation * 3
+
+
+def updateRatingBasedOnRecentFinsihedGames(finishedGamesGroupedByWinner, container):
+    standardDeviationDict = container.lot.playerStandardDeviation
+    meanDict = container.lot.playerMean
+    ratingdict = container.lot.playerRating
+    
+    for game in finishedGamesGroupedByWinner:
+        player1, player2 = game.players
+        winner = game.winner
+        loser = None
+        if winner == player1:
+            loser=player2
+        else:
+            loser = player1
+        
+        winnerPreviousMean = meanDict.get(winner.key().id(), InitialMean)
+        winnerPreviousStandardDeviation = standardDeviationDict.get(winner.key().id(), InitialStandardDeviation)
+        loserPreviousMean = meanDict.get(loser.key().id(), InitialMean)
+        loserPreviousStandardDeviation = standardDeviationDict.get(loser.key().id(), InitialStandardDeviation)
+        
+        winnerTrueSkillRating = Rating(winnerPreviousMean, winnerPreviousStandardDeviation)
+        loserTrueSkillRating = Rating(loserPreviousMean, loserPreviousStandardDeviation)
+        
+        # Apply TrueSkill algorithm to compute new rating based on game outcome.
+        winnerTrueSkillRating, loserTrueSkillRating = rate_1vs1(winnerTrueSkillRating, loserTrueSkillRating)
+        
+        #update the dicts
+        meanDict[winner.key().id()] = winnerTrueSkillRating.mu()
+        meanDict[loser.key().id()] = loserTrueSkillRating.mu()
+        standardDeviationDict[winner.key().id()] = winnerTrueSkillRating.sigma()
+        standardDeviationDict[loser.key().id()] = loserTrueSkillRating.sigma()
+        
+    # Once the mean,SD have been updated after considering all the games, compute the new Rating
+    for playerID in meanDict.keys():
+        ratingdict[playerID] = computeRating(meanDict[playerID], standardDeviationDict[playerID])
+    
+    container.lot.playerMean = meanDict
+    container.lot.playerStandardDeviation = standardDeviationDict
+    container.lot.playerRating = ratingdict
+    
+    logging.info('Ratings updated based on game results')    
