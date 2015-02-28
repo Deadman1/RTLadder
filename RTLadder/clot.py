@@ -83,9 +83,10 @@ def setRanks(container):
     
     allGames = [g for g in container.games]
     
-    # Set all games' HasRatingChangedDueToResult flag to true
+    # Set all finished games' HasRatingChangedDueToResult flag to true
     for game in allGames:
-        game.HasRatingChangedDueToResult = True
+        if game.winner != None:
+            game.HasRatingChangedDueToResult = True
         
     container.games = allGames    
     
