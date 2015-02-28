@@ -23,13 +23,12 @@ def execute(request, container):
     # TODO: Uncomment checkinprogressgames after testing
     checkInProgressGames(container)    
     clot.setRanks(container)
-    clot.createGames(request, container)
-        
     #Update the cache. We may not have changed anything, but we update it all of the time anyway. If we wanted to improve this we could set a dirty flag and check it here.
     container.lot.put()
     for game in container.games:
         game.put()
     container.changed()
+    clot.createGames(request, container)
     
     logging.info("Cron done")
 
