@@ -7,6 +7,7 @@ import random
 import os.path
 from datetime import datetime
 from TrueSkill.trueskill import Rating, rate_1vs1
+import operator
 
 
 #The template ID defines the settings used when the game is created.  You can create your own template on warlight.net and enter its ID here
@@ -62,20 +63,25 @@ def setRanks(container):
     updateRatingBasedOnRecentFinsihedGames(finishedGames, container)
     
     #Map this from Player.query() to ensure we have an entry for every player, even those with no wins(assign default rating if none exists)
-    playersMappedToRating = [(p, container.lot.playerRating.get(p.key.id(), computeRating(InitialMean, InitialStandardDeviation))) for p in container.players.values()]
-    playersMappedToMean = [(p, container.lot.playerMean.get(p.key.id(), InitialMean)) for p in container.players.values()]
-    playersMappedToStandardDeviation = [(p, container.lot.playerStandardDeviation.get(p.key.id(), InitialStandardDeviation)) for p in container.players.values()]
-        
+    playersMappedToRating = {}
+    playersMappedToMean = {}
+    playersMappedToStandardDeviation = {}
+    
+    for p in container.players.values():
+        playersMappedToRating[p.key.id()] = container.lot.playerRating.get(p.key.id(), computeRating(InitialMean, InitialStandardDeviation))
+        playersMappedToMean[p.key.id()] = container.lot.playerMean.get(p.key.id(), InitialMean)
+        playersMappedToStandardDeviation[p.key.id()] = container.lot.playerStandardDeviation.get(p.key.id(), InitialStandardDeviation)    
+       
     #sort by player rating.
-    playersMappedToRating.sort(key=lambda (player,rating): rating, reverse=True)
+    sortedPlayersByRating = sorted(playersMappedToRating.items(), key=operator.itemgetter(1), reverse=True)
     
     #Store the player IDs back into the LOT object
-    container.lot.playerRanks = [p[0].key.id() for p in playersMappedToRating]
+    container.lot.playerRanks = [p[0] for p in sortedPlayersByRating]
     container.lot.playerMean = playersMappedToMean
     container.lot.playerStandardDeviation = playersMappedToStandardDeviation
     container.lot.playerRating = playersMappedToRating
     
-    allGames = container.games
+    allGames = [g for g in container.games]
     
     # Set all games' HasRatingChangedDueToResult flag to true
     for game in allGames:
@@ -112,14 +118,14 @@ def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList
         p1 = game.players[0]
         p2 = game.players[1]
         if p1 in recentMatchups.keys():
-            recentMatchups[p1].append(p2)
+            recentMatchups[p1].add(p2)
         else:
-            recentMatchups[p1] = [p2]
+            recentMatchups[p1] = {p2}
             
         if p2 in recentMatchups.keys():
-            recentMatchups[p2].append(p1)
+            recentMatchups[p2].add(p1)
         else:
-            recentMatchups[p2] = [p1]
+            recentMatchups[p2] = {p1}
     
     """ Groups the list of players into pairs.  For example, [1,2,3,4,5] would return [1,2],[3,4]
     However if the two players in a pair have played each other recently, then a different pair is formed"""
@@ -142,7 +148,12 @@ def createPlayerPairs(completePlayerListSortedByRank, EligibleForGamesplayerList
         # start from i+1(next player) till numberOfPlayers
         for j in range (i+1, numOfPlayers+1):
             secondPlayer = eligiblePlayersSortedByRank[j-1]
-            if recentMatchups != None and firstPlayer in recentMatchups.keys() and secondPlayer in recentMatchups[firstPlayer]:
+            
+            if recentMatchups != None and firstPlayer.key.id() in recentMatchups.keys() and secondPlayer.key.id() in recentMatchups[firstPlayer.key.id()]:
+                # They have already played recently
+                continue
+            elif secondPlayer in playersAllotedGames:
+                # SecondPlayer has already been alloted a game with another eligible player
                 continue
             else:
                 playersAllotedGames.append(firstPlayer)
@@ -187,17 +198,17 @@ def updateRatingBasedOnRecentFinsihedGames(finishedGamesGroupedByWinner, contain
     
     for game in finishedGamesGroupedByWinner:
         player1, player2 = game.players
-        winner = game.winner
-        loser = None
-        if winner == player1:
-            loser=player2
+        winnerId = game.winner
+        loserId = None
+        if winnerId == player1:
+            loserId = player2
         else:
-            loser = player1
+            loserId = player1
         
-        winnerPreviousMean = meanDict.get(winner.key().id(), InitialMean)
-        winnerPreviousStandardDeviation = standardDeviationDict.get(winner.key().id(), InitialStandardDeviation)
-        loserPreviousMean = meanDict.get(loser.key().id(), InitialMean)
-        loserPreviousStandardDeviation = standardDeviationDict.get(loser.key().id(), InitialStandardDeviation)
+        winnerPreviousMean = meanDict.get(winnerId, InitialMean)
+        winnerPreviousStandardDeviation = standardDeviationDict.get(winnerId, InitialStandardDeviation)
+        loserPreviousMean = meanDict.get(loserId, InitialMean)
+        loserPreviousStandardDeviation = standardDeviationDict.get(loserId, InitialStandardDeviation)
         
         winnerTrueSkillRating = Rating(winnerPreviousMean, winnerPreviousStandardDeviation)
         loserTrueSkillRating = Rating(loserPreviousMean, loserPreviousStandardDeviation)
@@ -206,10 +217,10 @@ def updateRatingBasedOnRecentFinsihedGames(finishedGamesGroupedByWinner, contain
         winnerTrueSkillRating, loserTrueSkillRating = rate_1vs1(winnerTrueSkillRating, loserTrueSkillRating)
         
         #update the dicts
-        meanDict[winner.key().id()] = winnerTrueSkillRating.mu()
-        meanDict[loser.key().id()] = loserTrueSkillRating.mu()
-        standardDeviationDict[winner.key().id()] = winnerTrueSkillRating.sigma()
-        standardDeviationDict[loser.key().id()] = loserTrueSkillRating.sigma()
+        meanDict[winnerId] = winnerTrueSkillRating.mu
+        meanDict[loserId] = loserTrueSkillRating.mu
+        standardDeviationDict[winnerId] = winnerTrueSkillRating.sigma
+        standardDeviationDict[loserId] = loserTrueSkillRating.sigma
         
     # Once the mean,SD have been updated after considering all the games, compute the new Rating
     for playerID in meanDict.keys():

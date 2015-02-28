@@ -46,8 +46,10 @@ class LOTContainer():
     
     
     def changed(self):
-        """Call this after you update a LOT instance.  This will refresh the cache"""
+        """Call this after you update a LOT instance and it's games.  This will refresh the cache"""
         memcache.delete('lot_' + str(self.lot.key.id()), 5)
+        for game in self.games:
+            memcache.delete(str(game.key.id()), 5)
 
 
 def lotAddedOrRemoved():
