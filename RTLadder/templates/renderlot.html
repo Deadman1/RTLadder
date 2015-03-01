@@ -1,9 +1,7 @@
 
-<table>
+<table style="margin-bottom:100px">
     <tr>
-        <td valign="top">
-
-            
+        <td valign="top">            
             <h2>{{ container.players|length }} Players</h2>
             <table border="1">
                 <thead>
@@ -14,25 +12,19 @@
                     </tr>
                 </thead>
                 {%for player in container.playersSorted%}
-                <tr>
-        
+                <tr>        
                     <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
                     <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #00FF00" {%endif%}>
                         <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
                     </td>
-                    <td>{{ container.lot.playerRating.get(player.key.id(), 0) }}</td>
+                    <td>{{ container.lot.playerRating.get(player.key.id(), 0)|int }}</td>
                 </tr>
                 {%endfor%}
             </table>
             Green highlight means they're<br />playing in the ladder now.
-
         </td>
-        <td valign="top">
-
-
-            
+        <td valign="top">            
             <h2>{{ container.games|length }} Games</h2>
-
             <table border="1">
                 <thead>
                     <tr>
@@ -40,24 +32,66 @@
                         <td>Winner</td>
                     </tr>
                 </thead>
-                {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}
-    
+                {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}    
                 <tr>
                     <td>
                         <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{game.name}}</a>
-
                     </td>
                     <td>
                         {%if game.winner is not none%}
                         {{ container.players[game.winner].name|escape }}
                         {%endif%}
-
                     </td>
                 </tr>
-
                 {%endfor%}
             </table>
-
-        </td>
+        </td>  
+              
     </tr>
+</table>
+
+<table border="0">
+	<tr><th>Each game in this ladder will use a random template from the following list:</th></tr>
+	<tr>
+		<td>
+			<ul>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604721">604721</a> : China
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604722">604722</a> : Treasure Map
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604724">604724</a> : Season IV: No-luck strategic 1v1 
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604729">604729</a> : Season V: Battle Islands V map
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604730">604730</a> : Guiroma
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604733">604733</a> : Strategic Greece
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604734">604734</a> : Macro Land
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604737">604737</a> : Oxfordshire
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604740">604740</a> : New York
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604741">604741</a> : Cosmo Land
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604742">604742</a> : Volcano Island
+				</li>
+				<li>
+					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604743">604743</a> : Sumo
+				</li>
+			</ul>
+		</td>
+	</tr>
 </table>
