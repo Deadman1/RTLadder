@@ -35,7 +35,7 @@
                 {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}    
                 <tr>
                     <td>
-                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{game.name}}</a>
+                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{ container.players[game.players[0]].name|escape }} vs {{ container.players[game.players[1]].name|escape }}</a>
                     </td>
                     <td>
                         {%if game.winner is not none%}
