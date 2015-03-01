@@ -1,9 +1,20 @@
-
-<table style="margin-bottom:100px">
-    <tr>
-        <td valign="top">            
-            <h2>{{ container.players|length }} Players</h2>
-            <table border="1">
+    <div class="page-container">
+    <!-- top navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        </button>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div class="row row-offcanvas row-offcanvas-left">
+        <!--sidebar-->
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+          <div data-spy="affix" data-offset-top="45" data-offset-bottom="90">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <td>Rank</td>
@@ -14,84 +25,178 @@
                 {%for player in container.playersSorted%}
                 <tr>        
                     <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
-                    <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #00FF00" {%endif%}>
+                    <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #F0E68C" {%endif%}>
                         <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
                     </td>
                     <td>{{ container.lot.playerRating.get(player.key.id(), 0)|int }}</td>
                 </tr>
                 {%endfor%}
-            </table>
-            Green highlight means they're<br />playing in the ladder now.
-        </td>
-        <td valign="top">            
-            <h2>{{ container.games|length }} Games</h2>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <td>Game</td>
-                        <td>Winner</td>
-                    </tr>
-                </thead>
-                {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}    
-                <tr>
-                    <td>
-                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{ container.players[game.players[0]].name|escape }} vs {{ container.players[game.players[1]].name|escape }}</a>
-                    </td>
-                    <td>
-                        {%if game.winner is not none%}
-                        {{ container.players[game.winner].name|escape }}
-                        {%endif%}
-                    </td>
-                </tr>
-                {%endfor%}
-            </table>
-        </td>  
-              
-    </tr>
-</table>
-
-<table border="0">
-	<tr><th>Each game in this ladder will use a random template from the following list:</th></tr>
-	<tr>
-		<td>
-			<ul>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604721">604721</a> : China
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604722">604722</a> : Treasure Map
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604724">604724</a> : Season IV: No-luck strategic 1v1 
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604729">604729</a> : Season V: Battle Islands V map
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604730">604730</a> : Guiroma
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604733">604733</a> : Strategic Greece
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604734">604734</a> : Macro Land
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604737">604737</a> : Oxfordshire
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604740">604740</a> : New York
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604741">604741</a> : Cosmo Land
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604742">604742</a> : Volcano Island
-				</li>
-				<li>
-					<a href="https://www.warlight.net/MultiPlayer?TemplateID=604743">604743</a> : Sumo
-				</li>
-			</ul>
-		</td>
-	</tr>
-</table>
+            </table>            
+          </div>
+        </div>
+        <!--/sidebar-->
+        <!--/main-->
+        <div class="col-xs-12 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <a href="#" class="pull-right">View all</a> 
+                  <h4>Latest Games</h4>
+                </div>
+                <div class="panel-body">
+                  <div class="list-group">
+			            <table class="table table-bordered">
+			                <thead>
+			                    <tr>
+			                        <td><b>Game</b></td>
+			                        <td><b>Winner</b></td>
+			                        <td><b>Date</b></td>
+			                    </tr>
+			                </thead>
+			                {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}    
+			                <tr>
+			                    <td>
+			                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{ container.players[game.players[0]].name|escape }} vs {{ container.players[game.players[1]].name|escape }}</a>
+			                    </td>
+			                    <td>
+			                        {%if game.winner is not none%}
+			                        {{ container.players[game.winner].name|escape }}
+			                        {%endif%}
+			                    </td>
+			                    <td>
+			                    	{{ game.dateCreated.strftime('%Y-%m-%d %H:%M:%S') }}
+			                    </td>
+			                </tr>
+			                {%endfor%}
+			            </table>
+                  </div>
+                </div>
+                <!--/panel-body-->
+              </div>
+              <!--/panel-->              
+            </div>
+            <!--/col-->
+            <!-- Templates and FAQs -->
+            <div class="col-sm-6">              
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4>FAQs</h4>
+                </div>
+                <div class="panel-body">
+                  <div id="content">
+		            <ul class="nav nav-tabs" id="myTab">
+					  <li class="active"><a data-target="#about" data-toggle="tab">About</a></li>
+					  <li><a data-target="#gameallocation" data-toggle="tab">Game Allocation</a></li>
+					  <li><a data-target="#ranking" data-toggle="tab">Player Ranking</a></li>
+					  <li><a data-target="#other" data-toggle="tab">Other</a></li>
+					</ul>
+		
+					<div class="tab-content">
+					  <div class="tab-pane active" id="about">
+					  	<br/>				  	
+		  				<b>What is this all about?</b>
+		  				<p>This is a custom ladder made by <mark>Master of the Dead</mark>, themed on Fizzer's real-time ladder. It was created due the current limitations of the RT ladder.</p> 
+					  	<br/>					  	
+					  	<b>Why should I play here?</b>
+					  	<p>The current RT ladder has a few luck based templates. If paired with a weak player, you could end up losing all the points you have gathered over weeks because of just one game. This ladder aims to address that by removing templates such as EA&O :)</p>
+					  	<br/>
+					  	<b>Can we have more/different templates?</b>
+					  	<p>You are more than welcome to suggest new templates. I would like to keep replacing templates frequently so as to keep things interesting.</p>
+					  	<br/>
+					  	<b>Will you be making other ladders or team ladders?</b>
+					  	<p>I can make one if we can get a sizeable group interested</p>
+					  </div>
+					  <div class="tab-pane" id="gameallocation">	
+						<br/>				  	
+		  				<b>How are games allocated?</b>
+		  				<p>Games are allocated amongst players currently joined on the ladder. The ladder tries to pair similar players together.</p> 
+					  	<br/>					  	
+					  	<b>How frequently are games scheduled?</b>
+					  	<p>Games are scheduled every 10 minutes.</p>
+					  	<br/>					  	
+					  	<b>How is my next opponent determined?</b>
+					  	<p>All players who have joined the ladder, are sorted by rating. The highest rated player is paired with the next rated player(as long as they have not played each other recently). Every player is thus paired with the best eligible player.</p>
+					  	<br/>
+					  	<b>How often can I play the same opponent?</b>
+					  	<p>Two players cannot play each more than once in 4 hours.</p>
+					  	<br/>
+					  	<b>It has been forever, and I haven't gotten a game!! What's going on?</b>
+					  	<p>This can happen on a few rare occasions when there are odd number of players on the ladder. If you are ranked very low, the pairing algorithm may not have a player by the time it gets to you.</p>
+					  </div>
+					  <div class="tab-pane" id="ranking">					  	
+					  	<br/>				  	
+		  				<b>How are players ranked?</b>
+		  				<p>Players are ranked on this ladder using the TrueSkill Ranking algorithm. This system awards points only at the end of a game and does not make any further updates based on future results.</p> 
+					  						  	
+					  </div>
+					  <div class="tab-pane" id="other">
+					  	<br/>
+					  	<b>If I forget to leave the ladder, what will happen?</b>
+					  	<p>You will be allocated a game in the next cycle. Since you will lose that game on autoboot, you will be removed from the ladder, so as to prevent further game allocations.</p>
+					  	<br/>
+					  </div>
+					</div>
+				  </div>      
+                </div>
+                <!--/panel-body-->
+              </div>
+              <!--/panel-->
+              <div class="panel panel-default">
+                <div class="panel-heading">                  
+                  <h4>Templates Used</h4>
+                </div>
+                <div class="panel-body">
+                  <hr>
+					<ul>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604721">604721</a> : China
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604722">604722</a> : Treasure Map
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604724">604724</a> : Season IV: No-luck strategic 1v1 
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604729">604729</a> : Season V: Battle Islands V map
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604730">604730</a> : Guiroma
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604733">604733</a> : Strategic Greece
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604734">604734</a> : Macro Land
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604737">604737</a> : Oxfordshire
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604740">604740</a> : New York
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604741">604741</a> : Cosmo Land
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604742">604742</a> : Volcano Island
+						</li>
+						<li>
+							<a href="https://www.warlight.net/MultiPlayer?TemplateID=604743">604743</a> : Sumo
+						</li>
+					</ul>							
+                  <hr>                  
+                </div>
+                <!--/panel-body-->
+              </div>
+              <!--/panel-->
+            </div>
+            <!--/row-->
+          </div>
+          <!--/.row-->
+        </div>
+      </div>
+      <!--/.container-->
+    </div>
+    <!--/.page-container-->
