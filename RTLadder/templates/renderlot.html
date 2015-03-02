@@ -25,7 +25,7 @@
                 {%for player in container.playersSorted%}
                 <tr>        
                     <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
-                    <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #F0E68C" {%endif%}>
+                    <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #009933" {%endif%}>
                         <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
                     </td>
                     <td>{{ container.lot.playerRating.get(player.key.id(), 0)|int }}</td>
@@ -96,10 +96,10 @@
 					  <div class="tab-pane active" id="about">
 					  	<br/>				  	
 		  				<b>What is this all about?</b>
-		  				<p>This is a custom ladder made by <mark>Master of the Dead</mark>, themed on Fizzer's real-time ladder. It was created due the current limitations of the RT ladder.</p> 
+		  				<p>This is a custom ladder themed on Fizzer's real-time ladder. It was created due the current limitations of the RT ladder.</p> 
 					  	<br/>					  	
 					  	<b>Why should I play here?</b>
-					  	<p>The current RT ladder has a few luck based templates. If paired with a weak player, you could end up losing all the points you have gathered over weeks because of just one game. This ladder aims to address that by removing templates such as EA&O :)</p>
+					  	<p>The current RT ladder has a few luck based templates. If paired with a lower rated player, you could end up losing all the points you have gathered over weeks because of just one game. This ladder aims to address that by removing templates such as EA&O :)</p>
 					  	<br/>
 					  	<b>Can we have more/different templates?</b>
 					  	<p>You are more than welcome to suggest new templates. I would like to keep replacing templates frequently so as to keep things interesting.</p>
