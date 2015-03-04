@@ -53,6 +53,9 @@ body {
   background: #1E1E1E;
   color: #f9f9f9;
 }
+a {
+  color: #C0D0FF;
+}
 .text-center {
   padding-top: 20px;
 }
@@ -182,7 +185,7 @@ body {
 }
      
 h3,h4,h5,.panel {
-   color:#555555;
+   color:#FFFFFF;
 }
 .panel hr {
    border-color:#efefef;
