@@ -1,4 +1,16 @@
 table.table thead
 {
-	background: #800000
+	background: #6E6568
+}
+
+div.panel-default>.panel-heading {
+	background: #800000	
+}
+
+div.panel-default {
+	background-color: #303030
+}
+
+div.latest-games {
+	padding: 0px
 }
