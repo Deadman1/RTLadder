@@ -14,3 +14,8 @@ div.panel-default {
 div.latest-games {
 	padding: 0px
 }
+
+div.latest-games table tr td {
+	padding-left: 4px;
+	padding-right: 4px;
+}
