@@ -23,11 +23,24 @@ class JoinPage(BaseHandler):
         
         #Check if this invite token is new to us
         player = Player.query(Player.inviteToken == inviteToken).get()
+        
+        
+        data = json.loads(apiret)
+        currentColor = data['color']
+        currentName = data['name']
         if player is None:
-            data = json.loads(apiret)
-            player = Player(inviteToken=inviteToken, name=data['name'], color=data['color'])
+            player = Player(inviteToken=inviteToken, name=currentName, color=currentColor)
             player.put()
             logging.info("Created player " + unicode(player))
+        else:
+            # Update player details
+            if currentColor != player.color:
+                player.color = currentColor
+            if currentName != player.name:
+                player.name = currentName
+            player.put()
+            logging.info("Update player metadata for " + unicode(player))
+            
         
         #Set them as participating in the current lot
         addIfNotPresent(container.lot.playersParticipating, player.key.id())

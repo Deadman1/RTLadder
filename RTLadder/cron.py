@@ -20,9 +20,9 @@ class CronPage(BaseHandler):
 
 def execute(request, container):
     logging.info("Starting cron for " + container.lot.name + "...")
-    # TODO: Uncomment checkinprogressgames after testing
     checkInProgressGames(container)    
     clot.setRanks(container)
+    
     #Update the cache. We may not have changed anything, but we update it all of the time anyway. If we wanted to improve this we could set a dirty flag and check it here.
     container.lot.put()
     for game in container.games:
