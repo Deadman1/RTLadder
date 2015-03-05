@@ -35,21 +35,10 @@ hr {
   padding: 0 0 120px;
 }
 
-/* set the fixed height of the footer here */
-footer {
-  height: 120px;
-  background-color: #222222;
-  border:0 solid #080808;
-  border-top-width: 1px;
-  margin-top:50px;
-}
 
-footer > .container {
-  padding: 20px;
-}
 
 body {
-  padding-top: 51px; 
+  padding-top: 0px; 
   background: #1E1E1E;
   color: #f9f9f9;
 }
