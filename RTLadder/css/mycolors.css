@@ -19,3 +19,8 @@ div.latest-games table tr td {
 	padding-left: 4px;
 	padding-right: 4px;
 }
+
+div.panel-heading ul.pagination {
+	margin-top: 0px;
+	margin-bottom: 0px
+}

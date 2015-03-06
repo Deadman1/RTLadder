@@ -1,18 +1,16 @@
 {%extends "templates/base.html"%}
 {%block body%}
 
-<a href="/">&lt;&lt; Home</a>
-<h1>{{container.lot.name|escape}}</h1>
-
-
 {%if not container.lot.hasEnded()%}
-<a href="/join/{{container.lot.key.id()}}" class="btn btn-success">Join Ladder</a> | <a href="/leave/{{container.lot.key.id()}}" class="btn btn-danger">Leave Ladder</a>
-<br />
+<a href="/leave/{{container.lot.key.id()}}" class="btn btn-danger pull-right">Leave Ladder</a>
+<a href="/join/{{container.lot.key.id()}}" class="btn btn-success pull-right">Join Ladder</a>
 {%endif%}
 
+<a href="/" class="btn btn-primary pull-right">&lt;&lt; Home</a>
+
+<h1>{{container.lot.name|escape}}</h1>
+
 {{ lotrendered }}
-
-
 
 {%endblock%}
 
