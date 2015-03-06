@@ -31,12 +31,12 @@ class LOTContainer():
     games = None
     players = None
     
-    def render(self):
+    def render(self, pageName):
         #Before we render, sort players
         self.playersSorted = list(self.players.values())
         self.playersSorted.sort(key=lambda p: self.lot.playerRanks.index(p.key.id()) if p.key.id() in self.lot.playerRanks else 999999)
         
-        return get_template('renderlot.html').render({'container': self })
+        return get_template(pageName).render({'container': self })
     
     def playerRankOrBlank(self, playerID):
         if playerID not in self.lot.playerRanks:
