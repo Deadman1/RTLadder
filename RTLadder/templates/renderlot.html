@@ -30,7 +30,7 @@
             <div class="col-sm-6">
               <div class="panel panel-default">
                 <div class="panel-heading">
-                  <a href="#" class="pull-right">View all</a> 
+                  <ul class="pagination pagination-lg pager pull-right" id="myPager"></ul>
                   <h4>Latest Games</h4>
                 </div>
                 <div class="panel-body latest-games">
@@ -43,6 +43,7 @@
 			                        <td><b>Date</b></td>
 			                    </tr>
 			                </thead>
+							<tbody id="myTable">
 			                {%for game in container.games|sort(attribute='dateCreated', reverse=True)%}    
 			                <tr>
 			                    <td>
@@ -58,6 +59,7 @@
 			                    </td>
 			                </tr>
 			                {%endfor%}
+							</tbody>
 			            </table>
                   </div>
                 </div>
