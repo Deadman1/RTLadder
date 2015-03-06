@@ -18,19 +18,50 @@
 		                        <td>Rating</td>
 		                    </tr>
 		                </thead>
-		                {%for player in container.playersSorted%}
+		                {%for player in container.playersSorted[:10]  %}		                
 		                <tr>        
 		                    <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
-		                    <td {%if player.key.id() in container.lot.playersParticipating %} style="background-color: #009933" {%endif%}>
+		                    <td>
 		                        <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
 		                    </td>
 		                    <td>{{ container.lot.playerRating.get(player.key.id(), 0)|int }}</td>
-		                </tr>
+		                </tr>		                
 		                {%endfor%}
 		            </table>
                   </div>
                  </div>
               </div>
+             
+              <div class="panel panel-default">
+              	<div class="panel-heading">
+                  <h4>Players Currently Joined</h4>
+                </div>
+                <div class="panel-body latest-games">
+                  <div class="list-group">
+		            <table class="table table-bordered">
+		                <thead>
+		                    <tr>
+		                        <td>Rank</td>
+		                        <td>Player</td>
+		                        <td>Rating</td>
+		                    </tr>
+		                </thead>
+		                {%for player in container.playersSorted  %}
+		                {%if player.key.id() in container.lot.playersParticipating %} 
+		                <tr>        
+		                    <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
+		                    <td>
+		                        <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
+		                    </td>
+		                    <td>{{ container.lot.playerRating.get(player.key.id(), 0)|int }}</td>
+		                </tr>
+		                {%endif%}
+		                {%endfor%}
+		            </table>
+                  </div>
+                 </div>
+               </div>
+             
              </div>
               
             <div class="col-xs-12 col-sm-6 col-lg-5">
