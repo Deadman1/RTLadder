@@ -13,7 +13,7 @@ import lot
 class TestPage(BaseHandler):
     def renderPage(self, lotID, message):
         container = lot.getLot(lotID)
-        self.response.write(get_template('test.html').render({ 'container': container, 'renderedlot':  container.render(), 'message': message }))
+        self.response.write(get_template('test.html').render({ 'container': container, 'renderedlot':  container.render('renderlot.html'), 'message': message }))
     
     
     def get(self, lotID):
