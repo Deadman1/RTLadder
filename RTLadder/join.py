@@ -18,7 +18,22 @@ class JoinPage(BaseHandler):
         #Call the warlight API to get the name, color, and verify that the invite token is correct
         apiret = hitapi('/API/ValidateInviteToken', { 'Token':  inviteToken })
         
-        if not "tokenIsValid" in apiret:
+        
+        templates = [604721,604722,604724,604729,604730,604733,604734,604737,604740,604741,604742,604743]
+        templateIDs = ','.join(str(template) for template in templates)
+        
+        logging.info("current templates in use : " + templateIDs)
+        
+        #Call the warlight API to get the name, color, and verify that the invite token is correct
+        tempapiret = hitapi('/API/ValidateInviteToken', { 'Token':  inviteToken, 'TemplateIDs': templateIDs})
+        
+        logging.info('tempapi return value' + str(tempapiret))
+       
+        
+        logging.info("api return value = " + str(apiret))
+        logging.info("invite token = " + inviteToken)
+        
+        if (not "tokenIsValid" in tempapiret) or ("CannotUseTemplate" in tempapiret):
             return self.response.write('The supplied invite token is invalid.  Please contact the CLOT author for assistance.')
         
         #Check if this invite token is new to us
