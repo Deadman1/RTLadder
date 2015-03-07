@@ -19,7 +19,7 @@ class JoinPage(BaseHandler):
         apiret = hitapi('/API/ValidateInviteToken', { 'Token':  inviteToken })
         
         
-        templates = [604721,604722,604724,604729,604730,604733,604734,604737,604740,604741,604742,604743]
+        templates = [604721,604722,604724,604729,609134,604733,604734,604737,604740,604741,604742,609139]
         templateIDs = ','.join(str(template) for template in templates)
         
         logging.info("current templates in use : " + templateIDs)
