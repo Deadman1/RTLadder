@@ -8,3 +8,5 @@ https://www.warlight.net/wiki/Getting_Started_with_CLOT
 For auth related info:
 https://www.warlight.net/wiki/CLOT_Authentication
 
+Verification Change
+
