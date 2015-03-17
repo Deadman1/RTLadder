@@ -22,7 +22,7 @@
 		                <tr>        
 		                    <td>{{ container.playerRankOrBlank(player.key.id())  }}</td>
 		                    <td>
-		                        <a href="/player/{{player.key.id()}}">{{player.name|escape}}</a>
+		                        <a href="/player/playerId={{player.key.id()}}&&lotId={{container.lot.key.id()}}">{{player.name|escape}}</a>
 		                    </td>
 		                    <td>{{ container.lot.playerRating.get(player.key.id(), 0)|int }}</td>
 		                </tr>		                

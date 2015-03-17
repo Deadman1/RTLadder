@@ -1,4 +1,4 @@
-﻿{%extends "templates/base.html"%}
+{%extends "templates/base.html"%}
 {%block body%}
 
 <a href="/">&lt;&lt; Home</a>
@@ -20,23 +20,60 @@
 <a href="http://warlight.net/Profile?p={{player.inviteToken}}">WarLight.net profile</a><br />
 First joined: {{player.created}}<br />
 
-<h2>Games</h2>
-
-<table border="1" cellspacing="0">
-    <thead>
-        <tr>
-            <td>Game</td>
-        </tr>
-    </thead>
-    {%for game in games%}
-    
-    <tr>
-        <td><a href="http://warlight.net/MultiPlayer?GameID={{game.wlnetGameID}}">{{game.name}}</a></td>
-    </tr>
-
-    {%endfor%}
-</table>
-
+<div class="col-xs-12 col-sm-6 col-lg-5">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <ul class="pagination pagination-lg pager pull-right" id="myPager"></ul>
+                  <h4>Latest Games</h4>
+                </div>
+                <div class="panel-body latest-games">
+                  <div class="list-group">
+			            <table class="table table-bordered">
+			                <thead>
+			                    <tr>
+			                        <td><b>Game</b></td>
+			                        <td><b>Winner</b></td>
+			                        <td><b>Date</b></td>
+			                    </tr>
+			                </thead>
+							<tbody id="myTable">
+							{%for game in games|sort(attribute='dateCreated', reverse=True)%}
+								{%if game.winner is none%}
+					                <tr>
+					                    <td>
+					                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{ container.players[game.players[0]].name|escape }} vs {{ container.players[game.players[1]].name|escape }}</a>
+					                    </td>
+					                    <td>
+					                    </td>
+					                    <td>
+					                    	{{ game.dateCreated.strftime('%Y-%m-%d %H:%M') }}
+					                    </td>
+					                </tr>
+			                	{%endif%}
+			                {%endfor%}
+			                {%for game in games|sort(attribute='dateCreated', reverse=True)%}
+			                	{%if game.winner is not none%}
+				                	<tr {%if player.key.id() == game.winner %} style="background-color: #053805" {% else %} style="background-color: #300" {%endif%}>
+				                    <td>
+				                        <a href="http://warlight.net/MultiPlayer?GameID={{ game.wlnetGameID}}">{{ container.players[game.players[0]].name|escape }} vs {{ container.players[game.players[1]].name|escape }}</a>
+				                    </td>
+				                    <td>		                        
+				                        {{ container.players[game.winner].name|escape }}
+				                    </td>
+				                    <td>
+				                    	{{ game.dateCreated.strftime('%Y-%m-%d %H:%M') }}
+				                    </td>
+				                	</tr>
+			                	{%endif%}
+			                {%endfor%}
+							</tbody>
+			            </table>
+                  </div>
+                </div>
+                <!--/panel-body-->
+              </div>
+              <!--/panel-->              
+            </div>
 
 {%endblock%}
 
